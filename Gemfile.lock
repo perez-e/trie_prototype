@@ -50,4 +50,4 @@ DEPENDENCIES
   sinatra
   sinatra-contrib
   sinatra-websocket
-  thin
+  thin (= 1.6.2)
