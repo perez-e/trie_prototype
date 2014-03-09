@@ -1,5 +1,5 @@
 function Radix(){
-  this.prefixes = {};
+  this.children = {};
 }
 
 Radix.prototype.learn = function(word){
@@ -8,40 +8,49 @@ Radix.prototype.learn = function(word){
     return;
   }
 
-  for ( var prefix in this.prefixes ){
+  for ( var prefix in this.children ){
     var length = prefix.length;
 
     for (var index = length; index > 0; index--){
       var sliced_prefix = prefix.slice(0, index);
 
       if (word.indexOf(sliced_prefix) === 0){
-        var value = this.prefixes[prefix];
+        var value = this.children[prefix];
         if (sliced_prefix !== prefix){
-          this.prefixes[sliced_prefix] = new Radix();
-          this.prefixes[sliced_prefix].prefixes[prefix.slice(index, length)] = value;
-          delete this.prefixes[prefix];
+          this.children[sliced_prefix] = new Radix();
+          this.children[sliced_prefix].children[prefix.slice(index, length)] = value;
+          delete this.children[prefix];
         }
 
-        this.prefixes[sliced_prefix].learn(word.slice(sliced_prefix.length,word.length));
+        this.children[sliced_prefix].learn(word.slice(sliced_prefix.length,word.length));
         return;
       }
     }
   }
 
-  this.prefixes[word] = new Radix();
-  this.prefixes[word].isWord = true;
+  this.children[word] = new Radix();
+  this.children[word].isWord = true;
 };
 
-Radix.prototype.find = function(word){
-  if ( word === "" ) { return this; }
+Radix.prototype.find = function(word, path){
+  path = path || "";
+  if ( word === "" ) { return {node: this, path: path}; }
 
-  for (var prefix in this.prefixes){
+  for (var prefix in this.children){
       if (word.indexOf(prefix) === 0){
-        return this.prefixes[prefix].find(word.slice(prefix.length, word.length));
+        path += prefix;
+        return this.children[prefix].find(word.slice(prefix.length, word.length), path);
+      }
+
+      for (var index = prefix.length; index > 0; index--){
+        if ( word.indexOf(prefix.slice(0,index)) === 0 ){
+          path += prefix;
+          return this.children[prefix].find("" ,path);
+        }
       }
   }
 
-  return false
+  return null;
 
 };
 
@@ -53,9 +62,9 @@ Radix.prototype.getWords = function(words, currentWord){
    words.push(currentWord);
  }
 
- for ( var prefix in this.prefixes ) {
+ for ( var prefix in this.children ) {
    var newWord = currentWord + prefix;
-   this.prefixes[prefix].getWords(words, newWord);
+   this.children[prefix].getWords(words, newWord);
  }
 
  return words;
@@ -64,11 +73,12 @@ Radix.prototype.getWords = function(words, currentWord){
 
 Radix.prototype.autoComplete = function(prefix){
   var words = [];
-  if (this.find(prefix)){
-    var suffixes = this.find(prefix).getWords();
-
+  var result = this.find(prefix)
+  if (result){
+    var suffixes = result.node.getWords();
+    var path = result.path
     for (var i = 0; i < suffixes.length; ++i){
-      words.push( prefix + suffixes[i] );
+      words.push( path + suffixes[i] );
     }
     
   }
