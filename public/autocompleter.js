@@ -1,6 +1,6 @@
 Autocompleter = function(){
   // Trie mode:
-  this.data = new Trie();
+  this.data = new Radix();
 
   // Array mode:
   // this.data = [];
