@@ -46,11 +46,9 @@ Radix.prototype.find = function(word, path){
         return this.children[prefix].find(word.slice(prefix.length, word.length), path);
       }
 
-      for (var index = prefix.length; index > 0; index--){
-        if ( word === prefix.slice(0,index) ){
-          path += prefix
-          return this.children[prefix].find("", path)
-        }
+      if ( prefix.indexOf(word) === 0 ){
+        path += prefix
+        return this.children[prefix].find("", path)
       }
   }
 
