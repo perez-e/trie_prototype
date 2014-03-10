@@ -27,6 +27,7 @@ App.Routers.Main = Backbone.Router.extend({
   },
 
   index: function(){
+    alert("I'm in index");
   }
 
 });

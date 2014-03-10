@@ -47,9 +47,9 @@ Radix.prototype.find = function(word, path){
       }
 
       for (var index = prefix.length; index > 0; index--){
-        if ( word.indexOf(prefix.slice(0,index)) === 0 ){
-          path += prefix;
-          return this.children[prefix].find("" ,path);
+        if ( word === prefix.slice(0,index) ){
+          path += prefix
+          return this.children[prefix].find("", path)
         }
       }
   }
