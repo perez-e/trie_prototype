@@ -11,16 +11,20 @@ Radix.prototype.learn = function(word){
   for ( var prefix in this.children ){
     var length = prefix.length;
 
+    if (word.indexOf(prefix) === 0){
+      this.children[prefix].learn(word.slice(prefix.length, word.length))
+      return;
+    }
+
     for (var index = length; index > 0; index--){
       var sliced_prefix = prefix.slice(0, index);
 
       if (word.indexOf(sliced_prefix) === 0){
-        var value = this.children[prefix];
-        if (sliced_prefix !== prefix){
-          this.children[sliced_prefix] = new Radix();
-          this.children[sliced_prefix].children[prefix.slice(index, length)] = value;
-          delete this.children[prefix];
-        }
+        var node = this.children[prefix];
+
+        this.children[sliced_prefix] = new Radix();
+        this.children[sliced_prefix].children[prefix.slice(index, length)] = node;
+        delete this.children[prefix];
 
         this.children[sliced_prefix].learn(word.slice(sliced_prefix.length,word.length));
         return;
